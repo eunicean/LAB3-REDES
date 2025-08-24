@@ -1,0 +1,14 @@
+{
+  "type": "names",
+  "config": {
+    "A": "localhost:10000",
+    "B": "localhost:10001",
+    "C": "localhost:10002",
+    "D": "localhost:10003",
+    "E": "localhost:10004",
+    "F": "localhost:10005",
+    "G": "localhost:10006",
+    "H": "localhost:10007",
+    "I": "localhost:10008"
+  }
+}
