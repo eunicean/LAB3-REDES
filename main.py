@@ -37,6 +37,8 @@ def main():
     
     # Aqui es donde se verifica el tipo de algoritmo, hay que poner otro if para cada
     # algoritmo que vayamos a implementar
+    ########################################################################################################
+    # AQUI es donde se agregan algoritmos posibles
     if algorithm_name == 'flooding':
         routing_algorithm = Flooding()
     else:

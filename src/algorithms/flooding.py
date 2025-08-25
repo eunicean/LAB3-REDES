@@ -37,7 +37,7 @@ class Flooding:
 
     def start(self):
         self.running = True
-        self.node.logger.info("Algoritmo de flooding iniciado")
+        self.node.logger.info("Nodo inicializandose")
         
         while self.running:
             time.sleep(1)
