@@ -24,7 +24,7 @@ if __name__ == "__main__":
     message = {
         "proto": "flooding",
         "type": "message",
-        "from": "EXTERNAL",
+        "from": "A",
         "to": "G",  # Destino final
         "ttl": 10,
         "headers": [],

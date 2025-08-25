@@ -40,7 +40,7 @@ def main():
     if algorithm_name == 'flooding':
         routing_algorithm = Flooding()
     else:
-        # Para otros algoritmos (implementar más adelante)
+        # Para otros algoritmos 
         print(f"Algoritmo {algorithm_name} no implementado aún, usando flooding")
         routing_algorithm = Flooding()
     
