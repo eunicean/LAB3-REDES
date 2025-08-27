@@ -50,7 +50,6 @@ def main():
     message_text = ' '.join(sys.argv[3:])
     
     message = {
-        "proto": "flooding",
         "type": "message",
         "from": from_node,
         "to": to_node,

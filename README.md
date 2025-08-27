@@ -49,7 +49,6 @@ El archivo que contiene la topología completa que se menciona en las instruccio
 Todos los mensajes siguen un formato específico
 ```json
 {
-  "proto": "flooding|dijkstra|lsr|dvr|...",
   "type": "message|echo|info|hello|...",
   "from": "node_id",
   "to": "node_id",

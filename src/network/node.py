@@ -35,15 +35,15 @@ class Node:
         except Exception as e:
             self.logger.error(f"Error iniciando servidor: {e}")
 
+    # Intenta conectar a vecinos, pero sin bloquear ni fallar si no están disponibles
     def connect_to_neighbors(self, node_addresses):
-        """Intenta conectar a vecinos, pero sin bloquear ni fallar si no están disponibles"""
         for neighbor_id in self.neighbors:
             if neighbor_id in node_addresses:
                 threading.Thread(target=self.try_connect, 
                                args=(neighbor_id, node_addresses[neighbor_id])).start()
 
+    #Intenta conectar a un vecino con reintentos en segundo plano
     def try_connect(self, neighbor_id, address):
-        """Intenta conectar a un vecino con reintentos en segundo plano"""
         host, port_str = address.split(':')
         port = int(port_str)
         
@@ -54,7 +54,6 @@ class Node:
                     try:
                         # Enviar un ping simple para verificar conexión
                         ping_msg = json.dumps({
-                            "proto": "flooding",
                             "type": "hello",
                             "from": self.node_id,
                             "to": neighbor_id,
@@ -83,7 +82,6 @@ class Node:
                 time.sleep(3)  # Reintentar después de 3 segundos
 
     def handle_client(self, client_socket):
-        """Maneja conexiones entrantes usando el protocolo estándar"""
         try:
             data = client_socket.recv(4096).decode()
             if not data:
@@ -103,8 +101,8 @@ class Node:
             # No cerramos el socket para mantener la conexión
             pass
 
+    #Procesa mensajes según el protocolo definido
     def process_standard_message(self, message):
-        """Procesa mensajes según el protocolo definido"""
         message_type = message.get("type", "")
         
         if message_type == "hello":
@@ -114,8 +112,8 @@ class Node:
             # Delegar al algoritmo de routing
             self.routing_algorithm.handle_message(message)
 
+    #Envía mensaje usando el protocolo estándar
     def send_message(self, message, neighbor_id):
-        """Envía mensaje usando el protocolo estándar"""
         try:
             if neighbor_id in self.client_sockets:
                 sock = self.client_sockets[neighbor_id]
@@ -129,8 +127,8 @@ class Node:
                 del self.client_sockets[neighbor_id]
         return False
 
+    #Reenvía mensaje a todos los vecinos conectados
     def flood_message(self, message, exclude_neighbor=None):
-        """Reenvía mensaje a todos los vecinos conectados"""
         sent_count = 0
         for neighbor_id in self.client_sockets:
             if neighbor_id != exclude_neighbor:
