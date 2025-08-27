@@ -114,7 +114,15 @@ Es un script que levanta todos los nodos luego de unos segundos y da la opción 
 
 ```
 python tests/run_network.py
+
+# Usa flooding por defecto
+python tests/run_network.py
+
+# Usar dijkstra
+python tests/run_network.py --algorithm dijkstra
 ```
+
+Importante que dijkstra es registrado en el main e implementado el algoritmo por ejemplo
 
 ### tests/send_message.py
 Es otro script de prueba para mandar un mensaje una vez está levantada la red, ya sea manualmente nodo por nodo o bien con el run_network
@@ -127,11 +135,10 @@ python tests/send_message.py A G "Mensaje de prueba"
 # Pendientes
 
 1. Implementar 2 algoritmos más de routing
-2. Mejorar run_network para que reciba el algoritmo con el que se levanta la red en la terminal en lugar de que sea en el código
-3. Makefile
-4. Fase 2 xmpp
-5. forwardin y routing ahora mismo estan vacios
-6. La carpeta transport también tiene archivos vacios
+2. Makefile
+3. Fase 2 xmpp
+4. forwardin y routing ahora mismo estan vacios
+5. La carpeta transport también tiene archivos vacios
 
 
 # NOTA

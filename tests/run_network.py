@@ -6,6 +6,7 @@ import signal
 import threading
 import json
 import socket
+import argparse
 
 # Agregar el directorio raíz del proyecto al path de Python
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +27,7 @@ class NetworkManager:
     def start_all_nodes(self, algorithm='flooding'):
         """Inicia todos los nodos de la red"""
         self.running = True
-        print("niciando todos los nodos de la red...")
+        print(f"Iniciando todos los nodos de la red con algoritmo: {algorithm}")
         print("Los logs de cada nodo se mostrarán a continuación:")
         print("=" * 60)
         
@@ -112,7 +113,7 @@ class NetworkManager:
             except Exception as e:
                 print(f"Error deteniendo nodo {node_id}: {e}")
     
-    def send_test_message(self, from_node, to_node, message_text):
+    def send_test_message(self, from_node, to_node, message_text, proto="flooding"):
         """Envía un mensaje de prueba y verifica delivery"""
         if from_node not in self.node_addresses:
             print(f"Error: Nodo {from_node} no existe")
@@ -123,7 +124,7 @@ class NetworkManager:
         port = int(port_str)
         
         message = {
-            "proto": "flooding",
+            "proto": proto,
             "type": "message",
             "from": from_node,
             "to": to_node,
@@ -166,29 +167,39 @@ class NetworkManager:
                 print(log)
             print("-" * 50)
         else:
-            print(f"ℹNo hay logs disponibles para {node_id}")
+            print(f"No hay logs disponibles para {node_id}")
 
 def main():
+    # Configurar argumentos de línea de comandos
+    parser = argparse.ArgumentParser(description='Gestor de red para Laboratorio 3')
+    parser.add_argument('--algorithm', '-a', default='flooding', 
+                       choices=['flooding', 'dijkstra', 'lsr', 'dvr'],
+                       help='Algoritmo de enrutamiento a usar')
+    parser.add_argument('--send', action='store_true',
+                       help='Modo de envío rápido de mensajes')
+    parser.add_argument('--from-node', help='Nodo origen para envío rápido')
+    parser.add_argument('--to-node', help='Nodo destino para envío rápido')
+    parser.add_argument('--message', help='Mensaje para envío rápido')
+    
+    args = parser.parse_args()
+    
     # Agregar el path para los imports
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sys.path.insert(0, project_root)
     
-    if len(sys.argv) > 1 and sys.argv[1] == 'send':
-        # Modo rápido: solo enviar mensaje
+    # Modo de envío rápido
+    if args.send:
+        if not all([args.from_node, args.to_node, args.message]):
+            print("Error: Modo send requiere --from-node, --to-node y --message")
+            sys.exit(1)
+        
         manager = NetworkManager()
-        if len(sys.argv) >= 5:
-            from_node = sys.argv[2]
-            to_node = sys.argv[3]
-            message = ' '.join(sys.argv[4:])
-            manager.send_test_message(from_node, to_node, message)
-        else:
-            print("Uso: python tests/run_network.py send <from_node> <to_node> <message>")
+        manager.send_test_message(args.from_node, args.to_node, args.message, args.algorithm)
         return
     
     # Modo completo: iniciar todos los nodos
     manager = NetworkManager()
     
-
     def signal_handler(sig, frame):
         print("\n\nSeñal de interrupción recibida...")
         manager.stop_all_nodes()
@@ -196,38 +207,37 @@ def main():
     
     signal.signal(signal.SIGINT, signal_handler)
     
-    # Iniciar todos los nodos
-    #######################################################################################
-    # ACA ES DONDE SE PUEDE CAMBIAR EL ALGORITMO PA PROBAR
-    algorithm = 'flooding'
-    manager.start_all_nodes(algorithm)
+    # Iniciar todos los nodos con el algoritmo especificado
+    manager.start_all_nodes(args.algorithm)
     
     # Pequeña pausa para que los nodos se inicialicen
     time.sleep(5)
     
-
+    # Menú interactivo
     try:
         while True:
-        
+            print("\n" + "="*60)
             print("            MENÚ DE PRUEBAS - LAB3 REDES")
             print("="*60)
-            print("1.Enviar mensaje de prueba")
-            print("2.Mostrar estado de todos los nodos")
-            print("3.Ver logs de un nodo específico")
-            print("4.Ejecutar prueba automática")
-            print("5.Salir y detener todos los nodos\n")
+            print(f"Algoritmo actual: {args.algorithm}")
+            print("1. Enviar mensaje de prueba")
+            print("2. Mostrar estado de todos los nodos")
+            print("3. Ver logs de un nodo específico")
+            print("4. Ejecutar prueba automática")
+            print("5. Cambiar algoritmo (requiere reinicio)")
+            print("6. Salir y detener todos los nodos")
+            print("="*60)
             
-            
-            choice = input("Selecciona una opción (1-5): ").strip()
+            choice = input("Selecciona una opción (1-6): ").strip()
             
             if choice == '1':
-                print("\n---ENVIAR MENSAJE ---")
+                print("\n--- ENVIAR MENSAJE ---")
                 from_node = input("Nodo origen (ej: A): ").strip().upper()
                 to_node = input("Nodo destino (ej: G): ").strip().upper()
                 message = input("Mensaje: ").strip()
                 
                 if from_node and to_node and message:
-                    manager.send_test_message(from_node, to_node, message)
+                    manager.send_test_message(from_node, to_node, message, args.algorithm)
                     print("Revisa los logs arriba para ver el trayecto del mensaje")
                 else:
                     print("Error: Debes completar todos los campos")
@@ -243,18 +253,32 @@ def main():
                     print(f"Nodo {node_id} no encontrado")
                     
             elif choice == '4':
-                print("\n---PRUEBA AUTOMÁTICA ---")
+                print("\n--- PRUEBA AUTOMÁTICA ---")
                 print("Enviando mensaje de prueba de A a G...")
-                manager.send_test_message('A', 'G', 'Mensaje de prueba automática')
+                manager.send_test_message('A', 'G', 'Mensaje de prueba automática', args.algorithm)
                 time.sleep(2)
                 print("Prueba completada. Revisa los logs.")
                 
             elif choice == '5':
+                print("\n--- CAMBIAR ALGORITMO ---")
+                print("Algoritmos disponibles: flooding, dijkstra, lsr, dvr")
+                new_algorithm = input("Nuevo algoritmo: ").strip().lower()
+                if new_algorithm in ['flooding', 'dijkstra', 'lsr', 'dvr']:
+                    print(f"Reiniciando con algoritmo: {new_algorithm}")
+                    manager.stop_all_nodes()
+                    args.algorithm = new_algorithm
+                    manager = NetworkManager()
+                    manager.start_all_nodes(args.algorithm)
+                    time.sleep(5)
+                else:
+                    print("Algoritmo no válido")
+                    
+            elif choice == '6':
                 print("Saliendo...")
                 break
                 
             else:
-                print("Opción no válida. Por favor elige 1-5.")
+                print("Opción no válida. Por favor elige 1-6.")
                 
     except KeyboardInterrupt:
         print("\nInterrupción recibida...")
