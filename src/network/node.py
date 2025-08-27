@@ -54,6 +54,7 @@ class Node:
                     try:
                         # Enviar un ping simple para verificar conexión
                         ping_msg = json.dumps({
+                            "proto": "flooding",
                             "type": "hello",
                             "from": self.node_id,
                             "to": neighbor_id,

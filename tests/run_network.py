@@ -123,6 +123,7 @@ class NetworkManager:
         port = int(port_str)
         
         message = {
+            "proto": "flooding",
             "type": "message",
             "from": from_node,
             "to": to_node,
