@@ -3,6 +3,7 @@ import argparse
 from src.utils.config_loader import load_config, get_node_addresses, get_neighbors
 from src.network.node import Node
 from src.algorithms.flooding import Flooding
+from src.algorithms.dijkstra import Dijkstra
 
 def main():
     parser = argparse.ArgumentParser(description='Nodo de red con algoritmo de enrutamiento')
@@ -41,6 +42,10 @@ def main():
     # AQUI es donde se agregan algoritmos posibles
     if algorithm_name == 'flooding':
         routing_algorithm = Flooding()
+    elif algorithm_name == 'dijkstra':
+        routing_algorithm = Dijkstra()
+        # Para Dijkstra, cargamos la topología completa
+        routing_algorithm.build_topology_from_config(topo_config)
     else:
         # Para otros algoritmos 
         print(f"Algoritmo {algorithm_name} no implementado aún, usando flooding")
@@ -49,6 +54,9 @@ def main():
     # Crear e iniciar el nodo
     node = Node(node_id, neighbors, host, port, routing_algorithm)
     
+    if algorithm_name == 'dijkstra':
+        routing_algorithm.calculate_routes()
+
     try:
         node.start(node_addresses)
     except KeyboardInterrupt:
