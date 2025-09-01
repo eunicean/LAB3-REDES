@@ -88,8 +88,12 @@ class NetworkManager:
                 if line:
                     clean_line = line.strip()
                     if clean_line:
-                        print(f"[{node_id}-ERROR] {clean_line}")
-                        self.logs[node_id].append(f"ERROR: {clean_line}")
+                        # Detectar si es realmente un ERROR o solo un log normal
+                        if any(keyword in clean_line for keyword in ['ERROR', 'CRITICAL', 'FATAL']):
+                            print(f"[{node_id}-ERROR] {clean_line}")
+                        else:
+                            print(f"[{node_id}-LOG] {clean_line}")
+                        self.logs[node_id].append(clean_line)
                 time.sleep(0.1)
         except Exception as e:
             print(f"Error capturando stderr de {node_id}: {e}")
