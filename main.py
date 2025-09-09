@@ -4,6 +4,7 @@ from src.utils.config_loader import load_config, get_node_addresses, get_neighbo
 from src.network.node import Node
 from src.algorithms.flooding import Flooding
 from src.algorithms.dijkstra import Dijkstra
+from src.algorithms.link_state import LinkStateRouter
 
 def main():
     parser = argparse.ArgumentParser(description='Nodo de red con algoritmo de enrutamiento')
@@ -44,8 +45,12 @@ def main():
         routing_algorithm = Flooding()
     elif algorithm_name == 'dijkstra':
         routing_algorithm = Dijkstra()
-        # Para Dijkstra, cargamos la topología completa
         routing_algorithm.build_topology_from_config(topo_config)
+        # Para Dijkstra, cargamos la topología completa
+    elif algorithm_name == "lsr":
+        routing_algorithm = LinkStateRouter()
+        dijkstra = Dijkstra()
+        routing_algorithm.topology = dijkstra.build_topology_from_config(topo_config)
     else:
         # Para otros algoritmos 
         print(f"Algoritmo {algorithm_name} no implementado aún, usando flooding")

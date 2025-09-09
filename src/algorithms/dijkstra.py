@@ -24,6 +24,8 @@ class Dijkstra:
             self.logger.debug(f"Topología detallada: {self.topology}")
         else:
             self.logger.error("Formato de topología inválido - falta clave 'config'")
+
+        return self.topology
             
     def calculate_routes(self):
         """Calcula las rutas más cortas usando Dijkstra"""
@@ -83,7 +85,7 @@ class Dijkstra:
         for dest, info in self.routing_table.items():
             self.logger.debug(f"Ruta a {dest}: {info['path']} (costo: {info['cost']})")
         
-        return True
+        return self.routing_table
         
     def get_next_hop(self, destination):
         """Obtiene el próximo salto para un destino"""
